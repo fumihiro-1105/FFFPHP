@@ -24,6 +24,7 @@ class DbTest extends \PHPUnit_Framework_TestCase
     {
         $db = new Database();
         $this->assertEquals('127.0.0.1', $db->getHost());
+        $this->assertEquals(3306, $db->getPort());
         $this->assertEquals('msr', $db->getDatabase());
         $this->assertEquals('root', $db->getUser());
         $this->assertEquals('', $db->getPassword());
@@ -37,6 +38,7 @@ class DbTest extends \PHPUnit_Framework_TestCase
     {
         $db = new Database('platform');
         $this->assertEquals('db.platform.local', $db->getHost());
+        $this->assertEquals(3306, $db->getPort());
         $this->assertEquals('msr_platform', $db->getDatabase());
         $this->assertEquals('root', $db->getUser());
         $this->assertEquals('', $db->getPassword());

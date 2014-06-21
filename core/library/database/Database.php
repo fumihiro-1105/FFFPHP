@@ -30,6 +30,11 @@ class Database
     private $host;
 
     /**
+     * @var int
+     */
+    private $port;
+
+    /**
      * @var string
      */
     private $database;
@@ -77,6 +82,14 @@ class Database
     }
 
     /**
+     * @return int
+     */
+    public function getPort()
+    {
+        return $this->port;
+    }
+
+    /**
      * @return string
      */
     public function getDatabase()
@@ -108,7 +121,7 @@ class Database
     {
 
         if (!$this->isOpen()) {
-            $this->mysql      = mysqli_connect($this->host, $this->user, $this->password, $this->database);
+            $this->mysql = mysqli_connect($this->host, $this->user, $this->password, $this->database, $this->port);
             $this->statusOpen = true;
 
         }
@@ -217,6 +230,10 @@ class Database
             throw new \Exception('[Connection Config] Not string "host".');
         }
 
+        if (isset($connection['port']) && !is_string($connection['port'])) {
+            throw new \Exception('[Connection Config] Not numeric "port".');
+        }
+
         if (!is_string($connection['database'])) {
             throw new \Exception('[Connection Config] Not string "database".');
         }
@@ -246,6 +263,7 @@ class Database
         }
 
         $this->host     = $connection['host'];
+        $this->port = isset($connection['port']) ? (int) $connection['port'] : 3306;
         $this->database = $connection['database'];
         $this->user     = $connection['user'];
         $this->password = isset($connection['password']) ? $connection['password'] : '';
