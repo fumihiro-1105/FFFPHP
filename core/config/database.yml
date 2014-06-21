@@ -1,0 +1,10 @@
+master:
+    default:
+        host: 127.0.0.1
+        database: msr
+        user: root
+        password: null
+    platform:
+        host: db.platform.local
+        database: msr_platform
+        user: root
