@@ -87,4 +87,88 @@ class DbTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($db->isOpen());
     }
 
+    /**
+     * SELECT 文を発行
+     */
+    public function testSelect()
+    {
+        $db = new Database();
+        $db->open();
+        $result = $db->query('select 1 + 1 as `sum`');
+        $this->assertTrue(is_array($result));
+        $this->assertEquals(1, count($result));
+        $this->assertEquals(2, $result[0]->sum);
+        $db->close();
+    }
+
+    /**
+     * SELECT 文を発行（2行）
+     */
+    public function testSelectTwoRows()
+    {
+        $db = new Database();
+        $db->open();
+        $result = $db->query('select 1 + 1 as `sum` union all select 2 + 2 as `sum`');
+        $this->assertTrue(is_array($result));
+        $this->assertEquals(2, count($result));
+        $this->assertEquals(2, $result[0]->sum);
+        $this->assertEquals(4, $result[1]->sum);
+        $db->close();
+    }
+
+    /**
+     * DDL 文を発行（CREATE TABLE, DROP TABLE）
+     */
+    public function testDdl()
+    {
+        $db = new Database();
+        $db->open();
+        $ddl = 'create table test (id int(11) unsigned not null auto_increment, name varchar(255) not null, primary key (id))';
+        $this->assertTrue($db->query($ddl));
+        $ddl = 'drop table test';
+        $this->assertTrue($db->query($ddl));
+        $db->close();
+    }
+
+    /**
+     * DDL, DQL を発行（CREATE TABLE, INSERT, UPDATE, DELETE, SELECT, DROP TABLE）
+     */
+    public function testDdlAndDQL()
+    {
+        $db = new Database();
+        $db->open();
+        $ddl = 'create table test (id int(11) unsigned not null auto_increment, name varchar(255) not null, primary key (id))';
+        $this->assertTrue($db->query($ddl));
+
+        $dql = "insert into test (name) values ('okumura')";
+        $this->assertTrue($db->query($dql));
+
+        $dql    = "select * from test";
+        $result = $db->query($dql);
+        $this->assertTrue(is_array($result));
+        $this->assertEquals(1, count($result));
+        $this->assertEquals(1, $result[0]->id);
+        $this->assertEquals('okumura', $result[0]->name);
+
+        $dql = "update test set name = 'F.Okumura' where id = 1";
+        $this->assertTrue($db->query($dql));
+        $dql    = "select * from test";
+        $result = $db->query($dql);
+        $this->assertTrue(is_array($result));
+        $this->assertEquals(1, count($result));
+        $this->assertEquals(1, $result[0]->id);
+        $this->assertEquals('F.Okumura', $result[0]->name);
+
+        $dql = "delete from test where name = 'F.Okumura'";
+        $this->assertTrue($db->query($dql));
+        $dql    = "select * from test";
+        $result = $db->query($dql);
+        $this->assertTrue(is_array($result));
+        $this->assertEquals(0, count($result));
+
+        $ddl = 'drop table test';
+        $this->assertTrue($db->query($ddl));
+        $db->close();
+    }
+
 }

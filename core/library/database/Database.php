@@ -159,6 +159,37 @@ class Database
     }
 
     /**
+     * @param $sql
+     */
+    public function query($sql)
+    {
+        if (!$this->isOpen()) {
+            throw new \Exception('[Database] Connection Closed.');
+        }
+
+        $result = mysqli_query($this->mysql, $sql);
+
+        if ($result === true) {
+            // Success DDL, DQL(INSERT, UPDATE, DELETE, etc...)
+            return true;
+
+        } elseif ($result === false) {
+            // Query Failed
+            throw new \Exception('[Database] Query failure.' . PHP_EOL . $this->mysql->error);
+
+        } else {
+            // Success SELECT
+            $list = array();
+            while ($obj = $result->fetch_object()) {
+                $list[] = $obj;
+            }
+
+            return $list;
+        }
+
+    }
+
+    /**
      * 設定情報（yml ファイル）を取り込む
      */
     private function readConfig()
